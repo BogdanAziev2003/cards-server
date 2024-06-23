@@ -9,7 +9,7 @@ export const getAll = async (req, res) => {
       if (row.buy_time) {  
         row.buy_time = moment
           .tz(row.buy_time, 'Europe/Moscow')
-          .format('YYYY-MM-DD HH:mm:ss');
+          .format('DD.MM.YYYY');
       }
       return row;
     });
@@ -33,7 +33,7 @@ export const createCard = async (req, res) => {
   try {
     const result = await pool.query(
       `INSERT INTO cards (number, owner, broughter, phone, buy_time, status, info) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
-      [number, owner, broughter, phone, formattedDateTime, "прогрев", info]
+      [number, owner, broughter, phone, formattedDateTime, "grev", info]
     )
     res.json(result.rows[0])
   } catch (err) {
@@ -67,6 +67,31 @@ export const changeStatus = async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 };
+
+export const changeInfo = async (req, res) => {
+  const { id } = req.params;
+  const { info } = req.body;
+
+  if (!info) {
+    return res.status(400).json({ error: 'Info is required' });
+  }
+
+  try {
+    const result = await pool.query(
+      'UPDATE cards SET info = $1 WHERE id = $2 RETURNING *',
+      [info, id]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: 'Card not found' });
+    }
+
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error('Error executing query', err.stack);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+}
 
 export const deleteCard = async (req, res) => {
   const { id } = req.params;

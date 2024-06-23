@@ -1,5 +1,6 @@
 import express from "express"
 import {
+  changeInfo,
   changeStatus,
   createCard,
   deleteCard,
@@ -12,5 +13,6 @@ cardsRouter.get("/getAll", getAll)
 cardsRouter.post("/create", createCard)
 cardsRouter.put("/changeStatus/:id", changeStatus)
 cardsRouter.delete("/delete/:id", deleteCard)
+cardsRouter.put("/changeInfo/:id", changeInfo)
 
 export default cardsRouter
